@@ -56,6 +56,7 @@ function sendTelegramPhoto($photoPath, $caption = "") {
     curl_close($ch);
     
     // Debug log
-    // file_put_contents("debug_telegram.log", $result);
+    file_put_contents("debug_telegram.log", "Result: " . $result . "\n", FILE_APPEND);
 }
+
 ?>
