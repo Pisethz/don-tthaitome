@@ -1,0 +1,31 @@
+# Credentials
+telegram_tokens.txt
+telegram_config.php
+
+# Logs
+php_error.log
+.cloudflared.log
+LocationLog.log
+Log.log
+LocationError.log
+debug_log.php
+
+# Captured Data
+ip.txt
+saved.ip.txt
+current_location.txt
+location_*.txt
+cam*.png
+saved_locations/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Tools
+ngrok
+ngrok.exe
+cloudflared
+cloudflared.exe
+wget.exe
+unzip.exe

